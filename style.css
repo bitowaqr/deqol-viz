@@ -1,0 +1,136 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&display=swap');
+
+:root {
+  --primary_col: #7cb5ec;
+}
+
+html, body {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+}
+
+
+.btn.checkbtn.btn-light.active {
+  background-color: #337ab7;
+  color: white;
+}
+
+.btn.checkbtn.btn-light:hover {
+  color: white;
+  background-color: #7cb5ec;
+}
+
+.btn.checkbtn.btn-light{
+    -webkit-tap-highlight-color: transparent;
+    box-sizing: border-box;
+    font-family: inherit;
+    text-transform: none;
+    -webkit-appearance: button;
+    display: inline-block;
+    font-weight: 400;
+    line-height: 1.5;
+    user-select: none;
+    background-color: transparent;
+    border: 1px solid transparent;
+    border-radius: .25rem;
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    color: #0d6efd;
+    border-color: #0d6efd;
+    cursor: pointer;
+}
+
+
+#plot_ui {
+  z-index: 1;
+}
+
+.btn-plotinfo:hover {
+  opacity: 0.7;
+  color: white;
+  transform: scale(1.03,1.03);
+}
+.btn-plotinfo:focus {
+  color: white;
+}
+
+#close_modal {
+  pointer-events: fill;
+}
+
+#info_modalheader {
+  cursor: move;
+}
+
+#info_modal {
+  z-index: 99;
+}
+
+
+
+
+
+/*   INTRO */
+.split {
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  bottom: 0;
+  overflow-y: scroll;
+  overflow-x: scroll;
+}
+
+
+
+.right-intro {
+  width: 100%;
+  right: 0;
+  background-color: rgb(247, 247, 247);
+  z-index: 9 !important;
+}
+
+.intro-title {
+  font-weight: 300;
+  font-size: calc(8rem + 2.5vw);
+  line-height: 1.1;
+}
+
+.intro_sub {
+    width: 65%;
+    max-width: 1100px;
+}
+
+.centered {
+  width: 80%;
+  height: 100%;
+  font-size: 110%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.pos-low {
+  width: 100%;
+  height: 100%;
+  font-size: 110%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+
+.btn-start {
+  border-radius: 30px;
+  border: solid 1px lightgray;
+  min-width: 50px;
+  width: 200px;
+  background-color: #0d6efd;
+  color: white;
+  transition: all .1s ease-in-out;
+  font-size: 110%;
+
+}
+.btn-start:hover {
+  opacity: 0.9;
+  color: white;
+  transform: scale(1.05)
+}
