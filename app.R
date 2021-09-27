@@ -4,7 +4,7 @@ library(shiny)
 library(shinyWidgets)
 library(shinyjs)
 library(shinycssloaders)
-library(shinyBS)
+# library(shinyBS)
 
 
 library(feather)
@@ -266,10 +266,10 @@ ui <- fluidPage(
       </div>
       
       <div class = "fs-6 text-secondary w-50 mx-auto mb-4">
-      <sup>1</sup> Centre for Health Economics, University of York, York, UK.
-<sup>2</sup> School of Health and Related Research, University of Sheffield, Sheffield, UK.
-<sup>3</sup> BresMed, Sheffield, UK.
-<sup>4</sup> Department of Health Sciences, University of York, York, UK.
+      <sup>1</sup>School of Health and Related Research, University of Sheffield, Sheffield, UK. 
+<sup>2</sup>Centre for Health Economics, University of York, York, UK.
+<sup>3</sup>BresMed, Sheffield, UK.
+<sup>4</sup>Department of Health Sciences, University of York, York, UK.
 </div>
       
     </div>
