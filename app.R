@@ -49,11 +49,29 @@ years <- list(
   "EQ-5D-5L" = c(2017, 2018)
 )
 
+# modal txt ----
 modal_txt = list(
-  "hrqol" = "H",
-  "rel_ineq" = "2",
-  "abs_ineq" = "3",
-  "dim" = "4"
+  "hrqol" = HTML("
+    <p>This chart depicts the mean EQ-5D (3L or 5L) utility values over the lifecourse by sex and deprivation (imd) quintile.</p> 
+    Deprivation was measured using the Index of Multiple Deprivation (IMD), which combines multiple dimensions of relative 
+    deprivation (e.g. employment, income, education and housing, among other aspects) into a 
+    single index value.
+    "),
+  "rel_ineq" = "
+    The figure shows the relative gap in health-related quality of life between 
+    deprivation (imd) quintiles 1 and 5 over the lifecourse (i.e. the ratio between the mean 
+    EQ-5D utility scores of the most and the least deprived groups).
+    ",
+  "abs_ineq" = "
+    The figure shows the absolute gab in health-realted quality of life between 
+    deprivation (imd) quintiles 1 and 5 over the lifecourse (i.e. the difference between the mean 
+    EQ-5D utility scores of the most and the least deprived group).
+    ",
+  "dim" = "
+  The figure shows the proportion of participants reporting no, slight, moderate, severe 
+  and extreme (5L) or no, some, and severe (3L) problems on each of the five EQ-5D dimensions 
+  by deprivation (imd) quintile.
+  "
 )
 
 
@@ -161,10 +179,13 @@ ui <- fluidPage(
                "DeQoL-Life"
                  ),
              div(
-               class = " text-secondary mb-2",
+               class = " text-secondary",
                "Decomposing Quality of Life over the Lifecourse"
              ),
-             br(),
+             div(
+               class = "mb-3",
+               HTML('<a href="https://github.com/bitowaqr/deqol-viz">data+code</a>')
+             ),
              # instrument version ----
              selectInput("version", "Select instrument version", choices = c("EQ-5D-3L", "EQ-5D-5L")),
              # years -----
@@ -215,13 +236,17 @@ ui <- fluidPage(
              
              # imd -------
              div(class= "d-flex flex-row justify-content-start align-items-center",
-               checkboxGroupButtons(
-                 inputId = "imd",
-                 size = "normal",# width = "100%",
-                 label = "IMD (1 = most, 5 = least deprived)",
-                 choices = c("1","2","3","4", "5"),
-                 selected = c("1","2","3","4", "5"),
-                 status = "light"
+                 div(class= "d-flex flex-column justify-content-start align-items-start",
+                     HTML('<label class="control-label" >Index of multiple deprivation (imd)<br>quintile (1 = most, 5 = least deprived)</label>'),
+                   # "Index of multiple deprivation (imd) quintile (1 = most, 5 = least deprived)",
+                 checkboxGroupButtons(
+                   inputId = "imd",
+                   size = "normal",# width = "100%",
+                   label = NULL,
+                   choices = c("1","2","3","4", "5"),
+                   selected = c("1","2","3","4", "5"),
+                   status = "light"
+                 )
                ),
                div(
                  class = "mt-5 ms-3",
@@ -248,8 +273,8 @@ ui <- fluidPage(
     </div> 
      
      
-    <div class = "py-5" style = "background-color: lightgray">
-      <div class = "intro-title  mt-4 mb-3" >
+    <div class = "py-5  shadow" style = "background-color: #b9d4fd;">
+      <div class = "intro-title  mt-4 mb-3 fw-light"  >
           DeQoL-LIFE
       </div>
        
@@ -275,7 +300,7 @@ ui <- fluidPage(
     </div>
     
     <div class = "d-flex justify-content-center mt-5">
-      <div id = "close_intro" class="btn btn-start py-2 px-3 shadow">Start </div>
+      <div id = "close_intro" class="btn btn-start py-2 px-3 shadow-lg fs-2">Start </div>
     </div>
     
   </div>
