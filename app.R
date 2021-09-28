@@ -164,7 +164,7 @@ ui <- fluidPage(
   # menu  ------
   div(
     id = "menu",
-    class = "shadow pt-4 pb-3 border-top",
+    class = "shadow-lg pt-4 pb-3 border-top",
     style = "
     position: fixed;
     bottom: 0;
@@ -184,7 +184,7 @@ ui <- fluidPage(
              ),
              div(
                class = "mb-3",
-               HTML('<a href="https://github.com/bitowaqr/deqol-viz">data+code</a>')
+               HTML('<a href="https://github.com/bitowaqr/deqol-viz" target="_blank">data+code</a>')
              ),
              # instrument version ----
              selectInput("version", "Select instrument version", choices = c("EQ-5D-3L", "EQ-5D-5L")),
@@ -266,23 +266,39 @@ ui <- fluidPage(
   # landing page -----
   HTML('
 <div id = "intro_page">
-  <div class="split right-intro d-flex flex-column justify-content-center text-center">
+  <div 
+  class="split right-intro d-flex flex-column justify-content-center text-center"
+  style = "
+  background-image: url(g2.jpg);
+    background-position: center; 
+    background-repeat: no-repeat; 
+    background-size: cover; 
+  "
+  >
     
-    <div class = "display-6  mx-5 w-100 mx-auto text-primary mb-5">
+    <div class = "display-6  mx-5 w-100 mx-auto text-secondary mb-5">
         Data visualisation tool / online supplement
     </div> 
      
      
-    <div class = "py-5  shadow" style = "background-color: #b9d4fd;">
-      <div class = "intro-title  mt-4 mb-3 fw-light"  >
+    <div class = "py-5  " 
+    style = "
+    
+      
+    ">
+      <div class = "intro-title  mt-4  fw-light text-light" 
+      style = "font-family: Helvetica"
+      >
           DeQoL-LIFE
       </div>
        
-      <div class = "intro_sub display-4 text-secondary mx-5 mx-auto mb-4">
+      <div 
+      class = "intro_sub  display-6 text-secondary mx-5 mx-auto mb-5"
+      >
           Decomposing the socioeconomic gradient of health-related quality of life in England
       </div>
       
-      <div class = "fs-3 mb-3">
+      <div class = "fs-3 mb-3 text-light fw-lighter">
         Paul Schneider<sup>1</sup>, 
         James Love-Koh<sup>2</sup>, 
         Simon McNamara<sup>1,3</sup>, 
@@ -290,7 +306,7 @@ ui <- fluidPage(
         Nils Gutacker<sup>2</sup>
       </div>
       
-      <div class = "fs-6 text-secondary w-50 mx-auto mb-4">
+      <div class = "fs-6 text-secondary w-50 mx-auto mb-4  fw-lighter">
       <sup>1</sup>School of Health and Related Research, University of Sheffield, Sheffield, UK. 
 <sup>2</sup>Centre for Health Economics, University of York, York, UK.
 <sup>3</sup>BresMed, Sheffield, UK.
