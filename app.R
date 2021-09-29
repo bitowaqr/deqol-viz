@@ -41,9 +41,20 @@ dimGetter <- function(hse_combined,dim = 1, strata = c("imd","sex")){
   dim_aggs
 }
 
+# colors for imd
+cols <- viridis(5)
+cols <- substr(cols, 0, 7)
+names(cols) = 1:5
+
+# hse data aggregated
 hse = data.table(read_feather("hse.feather"))
 hse$imd = 6 - hse$imd
 
+# qale estimates 2017-18
+qale = read.csv("./qale.csv")
+qale$col = cols[qale$imd]
+
+# year choices
 years <- list(
   "EQ-5D-3L"  = c(2003,2004,2005,2006,2008,2010,2011,2012,2014), 
   "EQ-5D-5L" = c(2017, 2018)
@@ -52,7 +63,8 @@ years <- list(
 # modal txt ----
 modal_txt = list(
   "hrqol" = HTML("
-    <p>This chart depicts the mean EQ-5D (3L or 5L) utility values over the lifecourse by sex and deprivation (imd) quintile.</p> 
+    <p>This chart depicts the mean health-realted quality of life (HRQoL) over the lifecourse by sex and deprivation (imd) quintile.</p> 
+    <p>HRQoL was measured by the EQ-5D-3L (2003-2014) or EQ-5D-5L cross-walk (2017-2018) value set</p>.
     Deprivation was measured using the Index of Multiple Deprivation (IMD), which combines multiple dimensions of relative 
     deprivation (e.g. employment, income, education and housing, among other aspects) into a 
     single index value.
@@ -71,10 +83,26 @@ modal_txt = list(
   The figure shows the proportion of participants reporting no, slight, moderate, severe 
   and extreme (5L) or no, some, and severe (3L) problems on each of the five EQ-5D dimensions 
   by deprivation (imd) quintile.
-  "
+  ",
+  "qale_0" = HTML("
+  <p>The figure shows the quality-adjusted life expectancy (QALE) at birth by by deprivation (imd) quintile.</p>
+  <p>QALE was estimated by combining age-specific life expectancy and health-related quality of life over the lifecourse.</p>
+  "),
+  "qale_16" = HTML("
+  <p>The figure shows the quality-adjusted life expectancy (QALE) at age 16 by by deprivation (imd) quintile.</p>
+  <p>QALE was estimated by combining age-specific life expectancy and health-related quality of life over the lifecourse.</p>
+  "),
+  "qale_40" = HTML("
+  <p>The figure shows the quality-adjusted life expectancy (QALE) at  age 40 by by deprivation (imd) quintile.</p>
+  <p>QALE was estimated by combining age-specific life expectancy and health-related quality of life over the lifecourse.</p>
+  "),
+  "qale_65" = HTML("
+  <p>The figure shows the quality-adjusted life expectancy (QALE) at  age 65 by by deprivation (imd) quintile.</p>
+  <p>QALE was estimated by combining age-specific life expectancy and health-related quality of life over the lifecourse.</p>
+  ")
 )
 
-
+# hline helper func
 hline <- function(y = 0, color = "black") {
   list(
     type = "line",
@@ -173,91 +201,108 @@ ui <- fluidPage(
     background-color: white;
     ",
     fluidRow(
-      column(offset = 2, 3,
-             div(
-               class = "display-6",
-               "DeQoL-Life"
-                 ),
-             div(
-               class = " text-secondary",
-               "Decomposing Quality of Life over the Lifecourse"
-             ),
-             div(
-               class = "mb-3",
-               HTML('<a href="https://github.com/bitowaqr/deqol-viz" target="_blank">data+code</a>')
-             ),
-             # instrument version ----
-             selectInput("version", "Select instrument version", choices = c("EQ-5D-3L", "EQ-5D-5L")),
-             # years -----
-             checkboxGroupButtons(
-               inputId = "years",
-               label = "Use data from:", 
-               status = "light", size = "sm", 
-               choices = c("2003", "2006","2012","2014" )
-             ),
-             prettySwitch(
-               inputId = "pool_year",
-               label = "pool data",
-               value = T,fill = T,inline = T,status = "primary"
-             )
+      # style = "  white-space: nowrap; flex-wrap: nowrap;",
+      column(
+        offset = 2, 
+        width = 3,
+        style = "min-width: 250px;",
+        div(
+          class = "display-6",
+          "DeQoL-Life"
+          ),
+         div(
+           class = " text-secondary",
+           "Decomposing Quality of Life over the Lifecourse"
+         ),
+         div(
+           class = "mb-3",
+           HTML('<a href="https://github.com/bitowaqr/deqol-viz" target="_blank">data+code</a>')
+         ),
+         # instrument version ----
+         selectInput("version", "Select instrument version", choices = c("EQ-5D-3L", "EQ-5D-5L")),
+         # years -----
+         checkboxGroupButtons(
+           inputId = "years",
+           label = "Use data from:", 
+           status = "light", size = "sm", 
+           choices = c("2003", "2006","2012","2014" )
+         ),
+         prettySwitch(
+           inputId = "pool_year",
+           label = "pool data",
+           value = T,fill = T,inline = T,status = "primary"
+         )
       ),
-      column(4, offset = 1,
-             # var -----
-             selectInput(
-               inputId = "var", 
-               label = "Topic", 
-               choices = c(
-                 "HRQoL over the life course" = "hrqol", 
-                 "Relative inequality" ="rel_ineq",
-                 "Absolute inequality"="abs_ineq",
-                 "Dimension scores" = "dim"
-                 )
-               ),
-             
-             # sex -----
-             div(class= "d-flex flex-row justify-content-start align-items-center",
-               checkboxGroupButtons(
-                 inputId = "sex",
-                 size = "normal",# width = "100%",
-                 label = "Sex",
-                 choices = c("Male","Female"),
-                 selected = c("Male","Female"),
-                 status = "light"
-               ),
-               div(
-                 class = "mt-5 ms-5",
-                 prettySwitch(
-                   inputId = "pool_sex",
-                   label = "pool data",
-                   value = F,fill = T,inline = T,status = "primary"
-                 )
-               )
-             ),
-             
-             # imd -------
-             div(class= "d-flex flex-row justify-content-start align-items-center",
-                 div(class= "d-flex flex-column justify-content-start align-items-start",
-                     HTML('<label class="control-label" >Index of multiple deprivation (imd)<br>quintile (1 = most, 5 = least deprived)</label>'),
-                   # "Index of multiple deprivation (imd) quintile (1 = most, 5 = least deprived)",
-                 checkboxGroupButtons(
-                   inputId = "imd",
-                   size = "normal",# width = "100%",
-                   label = NULL,
-                   choices = c("1","2","3","4", "5"),
-                   selected = c("1","2","3","4", "5"),
-                   status = "light"
-                 )
-               ),
-               div(
-                 class = "mt-5 ms-3",
-                 prettySwitch(
-                   inputId = "pool_imd",
-                   label = "pool data",
-                   value = F,
-                   fill = T,inline = T,status = "primary"
-                 )
-               )
-             )
+      
+      column(
+        width = 4, offset = 1,
+        style = "min-width: 250px;",
+        # var -----
+        selectInput(
+          inputId = "var", 
+          label = "Topic", 
+          choices = list(
+            "Health-related quality of life (HRQoL)" = c(
+              "HRQoL over the life course" = "hrqol", 
+              "Relative inequality in HRQoL" ="rel_ineq",
+              "Absolute inequality  in HRQoL"="abs_ineq"
+              ),
+            "EQ-5D Dimension scores" = c(
+              "Scores" = "dim"
+            ),
+            "Quality-adjusted life expectancy (QALE)" = c(
+            "QALE at birth" = "qale_0",
+            "QALE at 16" = "qale_16",
+            "QALE at 40" = "qale_40",
+            "QALE at 65" = "qale_65"
+            )
+          )
+          ),
+        
+        # sex -----
+        div(class= "d-flex flex-row justify-content-start align-items-center",
+          checkboxGroupButtons(
+            inputId = "sex",
+            size = "normal",# width = "100%",
+            label = "Sex",
+            choices = c("Male","Female"),
+            selected = c("Male","Female"),
+            status = "light"
+          ),
+          div(
+            class = "mt-5 ms-5",
+            prettySwitch(
+              inputId = "pool_sex",
+              label = "pool data",
+              value = F,fill = T,inline = T,status = "primary"
+            )
+          )
+        ),
+        
+        # imd -------
+        div(class= "d-flex flex-row justify-content-start align-items-center",
+            div(class= "d-flex flex-column justify-content-start align-items-start",
+                HTML('<label class="control-label" >Index of multiple deprivation (imd)<br>quintile (1 = most, 5 = least deprived)</label>'),
+              # "Index of multiple deprivation (imd) quintile (1 = most, 5 = least deprived)",
+            checkboxGroupButtons(
+              inputId = "imd",
+              size = "normal",# width = "100%",
+              label = NULL,
+              choices = c("1","2","3","4", "5"),
+              selected = c("1","2","3","4", "5"),
+              status = "light"
+            )
+          ),
+          div(
+            class = "mt-5 ms-3",
+            prettySwitch(
+              inputId = "pool_imd",
+              label = "pool data",
+              value = F,
+              fill = T,inline = T,status = "primary"
+            )
+          )
+        )
       )
     )
   ),
@@ -331,39 +376,47 @@ server <- function(input, output, session){
 
   # update years for version ------
   observeEvent(input$version,{
-    updateCheckboxGroupButtons(session, "years", choices = years[[input$version]], status = "light", selected = years[[input$version]])
+    updateCheckboxGroupButtons(
+      session, "years", 
+      choices = years[[input$version]], 
+      status = "light", 
+      selected = years[[input$version]], 
+      disabled = ifelse(isolate(input$var) %in% c("qale_0","qale_16","qale_40","qale_65"), T, F)
+    )
   })
   
   
   # btn enabled/disabled logical  ----
   observeEvent(input$var,{
     
-    if(input$var == "dim"){
-      
-      updatePrettySwitch(session,"pool_sex", value = T)
-      disable("pool_sex")
-      
+    enable("pool_year")
+    enable("pool_sex")
+    enable("imd")
+    enable("pool_imd")
+    enable("version")
+    # enable("years")
+    updateCheckboxGroupButtons(session, "years", choices = years[[input$version]], status = "light", selected = years[[input$version]])
+    
+    if(input$var %in% c("qale_0","qale_16","qale_40","qale_65")){
+      updateSelectInput(session, "version", selected = "EQ-5D-5L")
+      disable("version")
       updatePrettySwitch(session, "pool_year", value = T)
       disable("pool_year")
-    
-    } else {
-      enable("pool_year")
-      enable("pool_sex")
     }
     
     
+    if(input$var == "dim"){
+      updatePrettySwitch(session, "pool_year", value = T)
+      updatePrettySwitch(session,"pool_sex", value = T)
+      disable("pool_sex")
+    }
+      
     if(input$var == "rel_ineq" | input$var == "abs_ineq"){
       disable("imd")
       disable("pool_imd")
-    } else {
-      enable("imd")
-      enable("pool_imd")
-    }
+    } 
     
-    
-      
-      
-      
+  
     
   })
    
@@ -426,11 +479,6 @@ server <- function(input, output, session){
       years_subplots = as.list(select_years)
       strata = c(strata,"year")
     }
-    
-    # colors for imd
-    cols <- viridis(5)
-    cols <- substr(cols, 0, 7)
-    names(cols) = 1:5
     
     # aggregate data
     df = hse[which(year %in% select_years & sex %in% select_sex & imd %in% select_imd),list(eq5d = weighted.mean(eq5d,wt,na.rm = T)),key=c(c(strata,"age5"))]
@@ -977,9 +1025,115 @@ server <- function(input, output, session){
       layout(
         hovermode = 'closest')
       
-    
   })
  
+  
+  
+  
+  # PLOTLY: qale Plot ------
+  observe({
+    if(grepl("qale", input$var)){
+     
+      select_var = paste0(isolate(input$var),"_plot")
+      select_age = substr(input$var, 6,10)
+      
+      if(input$pool_sex & length(input$sex) == 2){
+        select_sex = "Pooled"
+      } else {
+        select_sex = input$sex
+      }
+      
+      select_imd = input$imd
+      
+      output[[select_var]] <- renderPlotly({
+        
+        
+        qale_dat = qale[qale$sex %in% select_sex & qale$age == select_age & qale$imd %in% select_imd,]
+        
+        if(nrow(qale_dat)==0){
+          p1 = plot_ly(
+            type = "scatter", showlegend = F
+            #, height = set_height
+          ) %>%
+            add_trace(x = 1, y=1, text = "No data to display ", mode = 'text',
+                      textfont = list(color = '#000000', size = 36)) %>%
+            layout(
+              xaxis = list(zerolinecolor = '#ffff',
+                           zerolinewidth = 2,
+                           # gridcolor = 'ffff',
+                           showticklabels=FALSE),
+              yaxis = list(zerolinecolor = '#ffff',
+                           zerolinewidth = 2,
+                           # gridcolor = 'ffff',
+                           showticklabels=FALSE),
+              legend = list(orientation = 'h')
+            )
+          return(p1)
+        } 
+        
+        
+        figs = list()
+        
+        for(s in select_sex){
+          
+          fig_j = plot_ly( 
+            type = 'bar',
+          ) %>%
+            add_trace(
+              data = qale_dat[qale_dat$sex == s,], 
+              x = ~(imd), y = ~qale, 
+              marker = list(color = ~col),
+              text = ~paste("IMD ",imd),
+              # color = ~as.factor(6-level),  
+              type = 'bar',
+              hovertemplate = paste(
+                "<extra></extra><b>%{text}</b><br>",
+                "QALE: %{y:,.2f}<br>",
+                "IMD: %{x:,.0f}<br>"
+              )
+            ) %>%
+            add_annotations(
+              text = ~unique(sex),
+              x = 0.5,
+              y = 1,
+              yref = "paper",
+              xref = "paper",
+              xanchor = "middle",
+              yanchor = "top",
+              showarrow = FALSE,
+              font = list(size = 15, face = "bold")
+            )
+          
+          figs[[s]] = fig_j
+        }
+        
+        subplot(
+          figs
+        ) %>% 
+          layout(
+            yaxis = list(title = "Quality-adjusted life expectancy (QALE)"),
+            showlegend = FALSE
+          ) %>% 
+          config(
+            displaylogo = FALSE,
+            modeBarButtonsToRemove = c(
+              "zoom2d", "pan2d", "select2d", "lasso2d", "zoomIn2d", "zoomOut2d",
+              "autoScale2d",
+              # "resetScale2d",
+              "toggleHover","toggleSpikelines",
+              "hoverClosestGl2d", "hoverCompareCartesian","hoverClosestPie",
+              "hoverClosestCartesian")) 
+        # %>%
+        #     layout(hovermode = 'closest')
+        
+      })
+      
+      
+       
+    }
+  })
+  
+    
   
   
    
