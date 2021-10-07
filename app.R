@@ -64,7 +64,7 @@ years <- list(
 modal_txt = list(
   "hrqol" = HTML("
     <p>This chart depicts the mean health-realted quality of life (HRQoL) over the lifecourse by sex and deprivation (imd) quintile.</p> 
-    <p>HRQoL was measured by the EQ-5D-3L (2003-2014) or EQ-5D-5L cross-walk (2017-2018) value set</p>.
+    <p>HRQoL was measured by the EQ-5D-3L (2003-2014) or EQ-5D-5L cross-walk (2017-2018) value set.</p>
     Deprivation was measured using the Index of Multiple Deprivation (IMD), which combines multiple dimensions of relative 
     deprivation (e.g. employment, income, education and housing, among other aspects) into a 
     single index value.
@@ -190,6 +190,10 @@ ui <- fluidPage(
   
   
   # menu  ------
+  
+  # show menu link button
+  a(id = "show_controls", class = "", "show controls", style = "margin-top: -150px; visibility: hidden; cursor: pointer; color: #7cb5ec;"),
+  
   div(
     id = "menu",
     class = "shadow-lg pt-4 pb-3 border-top",
@@ -199,11 +203,18 @@ ui <- fluidPage(
     left:0;
     right: 0;
     background-color: white;
+    transition: 1s bottom;
     ",
     fluidRow(
       # style = "  white-space: nowrap; flex-wrap: nowrap;",
       column(
-        offset = 2, 
+        width = 2, 
+        
+        # hide menu link button
+        a(id = "hide_controls",class = "ms-3 ", "hide controls", style = "cursor: pointer; color: #7cb5ec;")
+        ),
+      column(
+        offset = 0, 
         width = 3,
         style = "min-width: 250px;",
         div(
@@ -214,12 +225,18 @@ ui <- fluidPage(
            class = " text-secondary",
            "Decomposing Quality of Life over the Lifecourse"
          ),
-         div(
-           class = "mb-3",
-           HTML('<a href="https://github.com/bitowaqr/deqol-viz" target="_blank">data+code</a>')
-         ),
-         # instrument version ----
-         selectInput("version", "Select instrument version", choices = c("EQ-5D-3L", "EQ-5D-5L")),
+           
+           a(class = "mb-3", 'href'="https://github.com/bitowaqr/deqol-viz", 'target' ="_blank", "data+code", style = "color: #7cb5ec;"),
+         # version ----
+         selectInput(
+           inputId = "version", 
+           label = "Select instrument version", 
+           choices = c(
+             "EQ-5D-3L" = "EQ-5D-3L", 
+             "EQ-5D-5L (van Hout et al. crosswalk)" = "EQ-5D-5L"
+             ), 
+           selected = "EQ-5D-5L"
+           ),
          # years -----
          checkboxGroupButtons(
            inputId = "years",
@@ -583,7 +600,7 @@ server <- function(input, output, session){
       layout(
         hovermode = 'closest',
         yaxis = list(
-          title = "Health-related quality of life (EQ-5D score)"
+          title = "Health-related quality of life <br>(EQ-5D score)"
         ),
         xaxis = list(
           title = "Age"
@@ -726,7 +743,7 @@ server <- function(input, output, session){
       layout(
         hovermode = 'closest',
         yaxis = list(
-          title = "HRQoL: inequality ratio (Most/Least deprived)"
+          title = "HRQoL: inequality ratio <br>(Most/Least deprived)"
         ),
         xaxis = list(
           title = "Age"
@@ -869,7 +886,7 @@ server <- function(input, output, session){
       layout(
         hovermode = 'closest',
         yaxis = list(
-          title = "HRQoL: absolute inequality (Most - Least deprived)"
+          title = "HRQoL: absolute inequality <br>(Most - Least deprived)"
         ),
         xaxis = list(
           title = "Age"
@@ -1005,13 +1022,22 @@ server <- function(input, output, session){
         
         fig[[paste(j,k)]] = fig_j %>%
           layout(
+            
             barmode = 'stack',
-            xaxis = list(title = ifelse(k == length(unique(dim_aggs_long_rel$imd)), paste(dim_names[j]),""))
+            xaxis = list(
+              title = list(
+                text = ifelse(k == length(unique(dim_aggs_long_rel$imd)), paste("age<br>",dim_names[j]),""),
+                standoff = 0
+              )
+            )
           )
       }  
       
     }
     
+    
+    
+
     subplot(fig,nrows = ceiling(length(fig)/5),titleY = TRUE,titleX = TRUE) %>% 
       config(
         displaylogo = FALSE,
@@ -1023,7 +1049,8 @@ server <- function(input, output, session){
           "hoverClosestGl2d", "hoverCompareCartesian","hoverClosestPie",
           "hoverClosestCartesian")) %>%
       layout(
-        hovermode = 'closest')
+        hovermode = 'closest'
+        )
       
   })
  
@@ -1111,7 +1138,7 @@ server <- function(input, output, session){
           figs
         ) %>% 
           layout(
-            yaxis = list(title = "Quality-adjusted life expectancy (QALE)"),
+            yaxis = list(title = "Quality-adjusted life expectancy<br>(QALE)"),
             showlegend = FALSE
           ) %>% 
           config(

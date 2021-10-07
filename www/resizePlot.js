@@ -30,7 +30,7 @@ $(document).on("shiny:connected", function() {
             el.parentNode.removeChild(el);
         }, speed);
     }
-
+    
     // speedy way to remove intor page: just press enter
     window.addEventListener('keydown', function(e){
         if (e.keyCode == 13) {
@@ -50,10 +50,12 @@ $(document).on("shiny:connected", function() {
   
 checkElement('#menu').then((selector) => {
   
+  var controls_visible = true;
+  
   // resize plot output to fit initial window size
   var w = window.innerHeight;
   var menu_box = document.querySelector('#menu').offsetHeight;
-  var value = window.innerHeight - menu_box - 20;
+  var value = w - menu_box - 20;
   Shiny.setInputValue('set_plot_height', value);
   
   // activate all tooltips
@@ -81,6 +83,34 @@ checkElement('#menu').then((selector) => {
       }
   }
 })
+
+
+  document.querySelector("#hide_controls").addEventListener("click", () => {
+    controls_visible = false;
+    var menu_box_adj = document.querySelector('#menu').offsetHeight + 300;
+    document.querySelector('#menu').style.bottom = -menu_box_adj + 'px';
+    var value = window.innerHeight - 50;
+    Shiny.setInputValue('set_plot_height', value);
+    document.querySelector("#hide_controls").style.visibility = "hidden";
+    document.querySelector("#show_controls").style.visibility = "visible";
+    });
+    
+    
+    
+  document.querySelector("#show_controls").addEventListener("click", () => {
+    controls_visible = true;
+    document.querySelector('#menu').style.bottom = 0 + 'px';
+    
+    
+    var w = window.innerHeight;
+    var menu_box = document.querySelector('#menu').offsetHeight;
+    var value = w - menu_box - 20;
+    Shiny.setInputValue('set_plot_height', value);
+      
+    document.querySelector("#hide_controls").style.visibility = "visible";
+    document.querySelector("#show_controls").style.visibility = "hidden";
+  });
+
 
 
 // modal draggable
@@ -132,8 +162,14 @@ function dragElement(elmnt) {
     
     var w = window.innerHeight;
     var menu_box = document.querySelector('#menu').offsetHeight;
-    var value = window.innerHeight - menu_box - 20;
-    Shiny.setInputValue('set_plot_height', value);
+    if(controls_visible){
+      var value = window.innerHeight - menu_box - 20;
+      Shiny.setInputValue('set_plot_height', value);  
+    } else {
+      var value = window.innerHeight - 50;
+      Shiny.setInputValue('set_plot_height', value);  
+    }
+    
     })
       );
 });
